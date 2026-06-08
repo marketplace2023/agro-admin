@@ -5,11 +5,12 @@ import { api } from '@/lib/api'
 
 interface QueueItem {
   id: number
-  title: string
-  sellerId: number
+  listingId: number
+  listingTitle: string
+  listingUserId: number
   priority: 'high' | 'normal'
+  status: string
   createdAt: string
-  type?: string
 }
 
 interface Listing {
@@ -99,11 +100,11 @@ export function PublicacionesPage() {
     if (tab === 'all') fetchAll()
   }, [tab, fetchAll])
 
-  async function approve(id: number) {
-    setActing(id)
+  async function approve(listingId: number) {
+    setActing(listingId)
     try {
-      await api.patch(`/listings/manage/listings/${id}/status`, { status: 'published' })
-      setQueue((q) => q.filter((item) => item.id !== id))
+      await api.patch(`/listings/manage/listings/${listingId}/status`, { status: 'published' })
+      setQueue((q) => q.filter((item) => item.listingId !== listingId))
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Error')
     } finally {
@@ -119,7 +120,7 @@ export function PublicacionesPage() {
         status: 'rejected',
         reason: rejectReason,
       })
-      setQueue((q) => q.filter((item) => item.id !== rejectId))
+      setQueue((q) => q.filter((item) => item.listingId !== rejectId))
       setRejectId(null)
       setRejectReason('')
     } catch (e) {
@@ -211,23 +212,23 @@ export function PublicacionesPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <Package className="h-3.5 w-3.5 shrink-0 text-gray-300" />
-                            <p className="font-semibold text-gray-800 max-w-xs truncate">{item.title}</p>
+                            <p className="font-semibold text-gray-800 max-w-xs truncate">{item.listingTitle}</p>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-500">#{item.sellerId}</td>
+                        <td className="px-4 py-3 text-gray-500">#{item.listingUserId}</td>
                         <td className="px-4 py-3 text-gray-400">{fmtDate(item.createdAt)}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-2">
                             <button
-                              onClick={() => approve(item.id)}
-                              disabled={acting === item.id}
+                              onClick={() => approve(item.listingId)}
+                              disabled={acting === item.listingId}
                               className="flex items-center gap-1.5 rounded-lg bg-agrobot-50 px-3 py-1.5 text-xs font-semibold text-agrobot-700 hover:bg-agrobot-100 disabled:opacity-50 transition-colors"
                             >
                               <CheckCircle className="h-3 w-3" /> Aprobar
                             </button>
                             <button
-                              onClick={() => { setRejectId(item.id); setRejectReason('') }}
-                              disabled={acting === item.id}
+                              onClick={() => { setRejectId(item.listingId); setRejectReason('') }}
+                              disabled={acting === item.listingId}
                               className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
                             >
                               <XCircle className="h-3 w-3" /> Rechazar
