@@ -117,7 +117,7 @@ export function BlogAdminPage() {
         content:         form.content || undefined,
         imageUrl:        form.imageUrl || undefined,
         category:        form.category || undefined,
-        tags:            form.tags ? form.tags.split(',').map((t) => t.trim()) : [],
+        tags:            form.tags || undefined,
         readTimeMinutes: Number(form.readTimeMinutes) || 5,
         isPublished:     form.isPublished,
       }
